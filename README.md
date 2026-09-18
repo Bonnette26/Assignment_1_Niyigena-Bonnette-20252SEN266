@@ -16,7 +16,7 @@ Sample data: at least 5 customers, 8 products(across at least 3 categories), 15 
 
 ---
 
-## Q1 — Orders with Customer Name, City, Date (INNER JOIN)
+## QJ1 — Orders with Customer Name, City, Date (INNER JOIN)
 
 SELECT o.order_id, c.customer_name, c.city, o.order_date
 FROM orders o
@@ -26,7 +26,7 @@ INNER JOIN customers c ON o.customer_id = c.customer_id;
 
 ---
 
-## Q2 — Order Items with Product Details (JOIN)
+## QJ2 — Order Items with Product Details (JOIN)
 
 SELECT oi.order_item_id, p.product_name, p.category, p.price, oi.quantity
 FROM order_items oi
@@ -36,7 +36,7 @@ JOIN products p ON oi.product_id = p.product_id;
 
 ---
 
-## Q3 — All Customers + Orders (LEFT JOIN)
+## QJ3 — All Customers + Orders (LEFT JOIN)
 
 SELECT c.customer_name, o.order_id, o.order_date
 FROM customers c
@@ -46,7 +46,7 @@ LEFT JOIN orders o ON c.customer_id = o.customer_id;
 
 ---
 
-## Q4 — Above-Average Spenders (CTE)
+## QC1 — Above-Average Spenders (CTE)
 
 WITH customer_totals AS (
   SELECT c.customer_id, c.customer_name,
@@ -65,7 +65,7 @@ WHERE total_spent > (SELECT AVG(total_spent) FROM customer_totals);
 
 ---
 
-## Q5 — Rank Customers by Total Spent
+## QW1 — Rank Customers by Total Spent
 
 SELECT c.customer_name,
        SUM(oi.quantity * p.price) AS total_spent,
@@ -80,7 +80,7 @@ GROUP BY c.customer_name;
 
 ---
 
-## Q6 — Number Each Customer's Orders
+## QW2 — Number Each Customer's Orders
 
 SELECT customer_id, order_id, order_date,
        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS order_num
@@ -90,7 +90,7 @@ FROM orders;
 
 ---
 
-## Q7 — Running Total of Revenue
+## QW3 — Running Total of Revenue
 
 SELECT o.order_date,
        SUM(oi.quantity * p.price) AS daily_revenue,
@@ -105,7 +105,7 @@ ORDER BY o.order_date;
 
 ---
 
-## Q8 — Days Between Consecutive Orders
+## QW4 — Days Between Consecutive Orders
 
 SELECT customer_id, order_id, order_date,
        order_date - LAG(order_date) OVER (PARTITION BY customer_id ORDER BY order_date) AS days_gap

@@ -3,9 +3,9 @@
 -- Each question below matches the assignment numbering.
 -- Run schema.sql then Data.sql before these.
 -- ============================================================
-
+--JOIN QUERIES
 -- ------------------------------------------------------------
--- Q1. List every order with the customer's name and city, and the order date.
+-- QJ1. List every order with the customer's name and city, and the order date.
 -- (INNER JOIN: orders + customers)
 -- ------------------------------------------------------------
 SELECT
@@ -19,7 +19,7 @@ ORDER BY o.order_date;
 
 
 -- ------------------------------------------------------------
--- Q2. List every order item with the product name, category, price, and
+-- QJ2. List every order item with the product name, category, price, and
 -- quantity ordered. (JOIN: order_items + products)
 -- ------------------------------------------------------------
 SELECT
@@ -34,7 +34,7 @@ ORDER BY oi.order_id, oi.order_item_id;
 
 
 -- ------------------------------------------------------------
--- Q3. List all customers and, where they exist, their orders -
+-- QJ3. List all customers and, where they exist, their orders -
 -- including customers who have never placed an order.
 -- (LEFT JOIN: customers + orders)
 -- ------------------------------------------------------------
@@ -47,16 +47,16 @@ LEFT JOIN orders o ON c.customer_id = o.customer_id
 ORDER BY c.customer_name;
 
 
--- ------------------------------------------------------------
--- Q4. Each customer's total amount spent (quantity x price, summed across
--- all order items), returning only customers who spent above the average
--- customer spend. (CTE for per-customer totals, then filter vs. average.)
+--CTE QUERIES ------------------------------------------------------------
+-- QC1. Calculate Each customer's total spend (quantity x price) and 
+-- return customers above thewho spent above the average spend
+--use CTE to compute customer totals first.
 -- ------------------------------------------------------------
 WITH customer_totals AS (
     SELECT
         c.customer_id,
         c.customer_name,
-        SUM(oi.quantity * p.price) AS total_spent
+        SUM(oi.quantity * p.price) AS total_spend
     FROM customers c
     JOIN orders o        ON o.customer_id = c.customer_id
     JOIN order_items oi  ON oi.order_id = o.order_id
@@ -68,12 +68,12 @@ SELECT
     customer_name,
     total_spent
 FROM customer_totals
-WHERE total_spent > (SELECT AVG(total_spent) FROM customer_totals)
-ORDER BY total_spent DESC;
+WHERE total_spend > (SELECT AVG(total_spend) FROM customer_totals)
+ORDER BY total_spend DESC;
 
-
+--WINDOW FUNCTION
 -- ------------------------------------------------------------
--- Q5. Rank customers by total amount spent, highest first.
+-- QW1. Rank customers by total amount spent, highest first.
 -- (Window function: RANK())
 -- ------------------------------------------------------------
 WITH customer_totals AS (
@@ -97,7 +97,7 @@ ORDER BY spend_rank;
 
 
 -- ------------------------------------------------------------
--- Q6. Number each customer's orders in the order they were placed.
+-- QW2. Number each customer's orders in the order they were placed.
 -- (Window function: ROW_NUMBER() partitioned by customer)
 -- ------------------------------------------------------------
 SELECT
@@ -110,7 +110,7 @@ ORDER BY customer_id, order_sequence;
 
 
 -- ------------------------------------------------------------
--- Q7. Show a running total of revenue over time, ordered by order date.
+-- QW3. Show a running total of revenue over time, ordered by order date.
 -- (Window function: SUM() OVER ... running total)
 -- ------------------------------------------------------------
 WITH order_revenue AS (
@@ -134,7 +134,7 @@ ORDER BY order_date, order_id;
 
 
 -- ------------------------------------------------------------
--- Q8. For each customer with more than one order, show how many days
+-- QW4. For each customer with more than one order, show how many days
 -- passed between their current and previous order.
 -- (Window function: LAG())
 -- ------------------------------------------------------------
